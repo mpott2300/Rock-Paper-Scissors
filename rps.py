@@ -6,19 +6,8 @@
 # The Player class is selected at random for the computer.
 # Select the number of rounds and enjoy.
 import random
+
 moves = ['rock', 'paper', 'scissors']
-
-
-def inputNumber(message):
-    while True:
-        try:
-            userInput = int(input(message))
-        except ValueError:
-            print("Not an integer! Try again.")
-            continue
-        else:
-            return userInput
-            break
 
 
 class Player:
@@ -57,17 +46,16 @@ class CyclePlayer(Player):
     def move(self):
         throw = None
         if self.step == 0:
-            throw = moves[0]
-            self.step = self.step + 1
-        elif self.step == 1:
             throw = moves[1]
             self.step = self.step + 1
-        else:
+        elif self.step == 1:
             throw = moves[2]
             self.step = self.step + 1
-        return throw
-        while moves > 2:
+        else:
             throw = moves[0]
+            self.step = self.step + 1
+        return throw
+
 
 class HumanPlayer(Player):
     def move(self):
@@ -85,12 +73,13 @@ def beats(one, two):
             (one == 'paper' and two == 'rock'))
 
 
+# Game mechanics
 class Game:
     p1_score = 0
     p2_score = 0
 
-    def __init__(self, p1, p2):
-        self.p1 = p1
+    def __init__(self, p2):
+        self.p1 = HumanPlayer()
         self.p2 = p2
 
     def play_round(self):
@@ -101,21 +90,21 @@ class Game:
         self.p2.learn(move2, move1)
         if beats(move1, move2):
             self.p1_score += 1
-            print('** Player 1 wins! **')
+            print('* Player 1 wins! *')
         else:
             if move1 == move2:
-                print('** Tie **')
+                print('* Tie *')
             else:
                 self.p2_score += 1
-                print('** Player 2 wins! **')
+                print('* Player 2 wins! *')
 
         print(f"Player:{self.p1.__class__.__name__}, Score:{self.p1_score}")
         print(f"Player:{self.p2.__class__.__name__}, Score:{self.p2_score}")
 
+# This will call a tourney
     def play_game(self):
-        print("Game start!")
-        number_rounds = inputNumber("How many round do you want to play? ")
-        for round in range(number_rounds):
+        print("Game Start!")
+        for round in range(3):
             print(f"Round {round}:")
             self.play_round()
         if self.p1_score > self.p2_score:
@@ -124,26 +113,67 @@ class Game:
             print('** Sadly Player 2 WINS! **')
         else:
             print('** The match was a tie! **')
-        print('The final score is ' + str(self.p1_score) + ' TO ' +
+        print('The final score is: ' + str(self.p1_score) + ' TO ' +
               str(self.p2_score))
         print("Game over!")
 
+# This will call a singe game.
+    def play_single(self):
+        print("Single Game Start!")
+        print(f"Round 1 of 1:")
+        self.play_round()
+        if self.p1_score > self.p2_score:
+            print('** Congrats! Player 1 WINS! **')
+        elif self.p1_score < self.p2_score:
+            print('** Sadly Player 2 WINS! **')
+        else:
+            print('** The game was a tie! **')
+        print('The final score: ' + str(self.p1_score) + ' TO ' +
+              str(self.p2_score))
+
 
 if __name__ == '__main__':
-    strategies = {
+    p2 = {
         "1": Player(),
         "2": RandomPlayer(),
         "3": CyclePlayer(),
         "4": ReflectPlayer()
-    }
+        }
 
-    user_input = inputNumber("Select the player strategy "
-                             "you want to play against: "
-                             "1-Rock Player "
-                             "2-Random Player "
-                             "3-Cycle Player "
-                             "4-Reflect Player ")
-    # p1 = HumanPlayer()
-    # p2 = Player()
-    game = Game(HumanPlayer, strategies[user_input])
-    game.play_game()
+# Selecting Opponent
+    while True:
+        try:
+            p2 = int(input("Select the strategy "
+                           "you want to play against:  "
+                           "1 - Rock Player "
+                           "2 - Random Player "
+                           "3 - Cycle Player "
+                           "4 - Reflect Player: "))
+
+
+#    input("Select strategy: "))
+        except ValueError:
+            print("Sorry, I didn't understand that.")
+            continue
+
+        if p2 > 4:
+            print("Sorry, you must select [1-4]: ")
+            continue
+        else:
+            break
+
+
+# Slecting 1 or 3 games
+    rounds = input('Enter for [s]ingle game or [f]ull game: ')
+    Game = Game(p2)
+    while True:
+        if rounds == 's':
+            Game.play_single()
+            break
+        elif rounds == 'f':
+            Game.play_game()
+            break
+        else:
+            print('Please select again')
+            rounds = input('Enter [s] for a single'
+                           'game and [f] for a full game: ')
